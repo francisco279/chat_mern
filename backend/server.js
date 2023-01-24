@@ -1,10 +1,13 @@
 const express   = require("express"); //fot the server
 const { chats } = require("./data/data");
 const dotenv    = require("dotenv");
-const cors      = require('cors')
+const cors      = require('cors');
+const connectDB = require("./config/db");
 
-const app = express();
+
 dotenv.config();
+connectDB(); //connect to the DB
+const app = express();
 
 //middleware
 app.use(cors());
