@@ -1,4 +1,6 @@
-const User = require("../models/userModel");
+const generateToken = require("../config/generateToken");
+const User          = require("../models/userModel");
+
 //function to register users
 const registerUser = async(req, res) => {
     const { name, email, password, pic } = req.body;
@@ -35,7 +37,8 @@ const registerUser = async(req, res) => {
                 _id:   user._id,
                 name:  user.name,
                 email: user.email,
-                pic:   user.pic
+                pic:   user.pic,
+                token: generateToken(user._id),
             }
         );
     }
@@ -46,4 +49,35 @@ const registerUser = async(req, res) => {
     }
 };
 
-module.exports = { registerUser };
+//Login function
+const authUser = async(req, res) => {
+    const {email, password} = req.body;
+    //check if the email exist
+    const user = await User.findOne({email});
+    //if user exist and the password is correct
+    if (user && (await user.matchPassword(password))) 
+    {
+        res.json
+        (
+            {
+                _id:     user._id,
+                name:    user.name,
+                email:   user.email,
+                isAdmin: user.isAdmin,
+                pic:     user.pic,
+                token:   generateToken(user._id),
+            }
+        );
+    } 
+    else
+    {
+        res.status(401);
+        throw new Error("Invalid Email or Password");
+    }
+};
+
+module.exports = 
+{ 
+    registerUser, 
+    authUser
+};
