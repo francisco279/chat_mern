@@ -76,8 +76,42 @@ const authUser = async(req, res) => {
     }
 };
 
+//function to get all the users
+const allUsers = async(req, res) => {
+    //return all the users that the email or name was entered
+    const keyword = req.query.search ?
+    {
+        $or: 
+        [
+            { 
+                name: 
+                {
+                    $regex  : req.query.search, 
+                    $options: "i"
+                }
+            },
+            {
+                email: 
+                {
+                    $regex  : req.query.search, 
+                    $options: "i"
+                }
+            }
+        ] 
+    }
+    :
+    {};
+ //get all tha users with except a specific id 
+    const users = await User.find(keyword).find({_id: { $ne: req.query._id}});
+    res.send(users);
+
+    console.log(keyword);
+}
+
+
 module.exports = 
 { 
     registerUser, 
-    authUser
+    authUser,
+    allUsers,
 };
